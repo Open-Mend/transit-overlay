@@ -27,7 +27,13 @@ choose Transit → On.
 
 Coverage depends on Google's transit data and is best in larger cities.
 
-Privacy: collects no data and makes no network requests of its own.
+Why "Access your data for www.zillow.com"? Firefox shows that wording for
+any extension that changes a website. This extension only adds the Transit
+option to the map menu and turns on the transit layer. It does not read your
+Zillow account, saved homes, searches or messages, and it makes no network
+requests of its own. You can check this in the source code below.
+
+Privacy: collects no data.
 Open source: https://github.com/Open-Mend/transit-overlay
 
 Not affiliated with or endorsed by Zillow.
