@@ -12,6 +12,7 @@ www.zillow.com", the standard wording for any extension that changes a site.
 It only adds the Transit option and turns on the transit layer; it doesn't
 read your Zillow account, saved homes, searches or messages. All of the code
 is in [inject.js](inject.js).
+
 Not affiliated with or endorsed by Zillow. MIT licensed.
 
 ## Install
