@@ -1,0 +1,23 @@
+# Push a tag like v0.4.1 to build both store zips and publish them as a
+# GitHub Release. The release is created by github-actions, so anyone can
+# check that the store packages match this code.
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check tag matches manifest version
+        run: |
+          version=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")
+          [ "v$version" = "$GITHUB_REF_NAME" ] || { echo "Tag $GITHUB_REF_NAME != manifest v$version"; exit 1; }
+      - run: python3 build.py
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.zip --title "$GITHUB_REF_NAME" --generate-notes
