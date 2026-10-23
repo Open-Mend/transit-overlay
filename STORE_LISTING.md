@@ -5,6 +5,9 @@ Same text for all three stores unless noted.
 ## Name
 Transit Overlay for Home Search
 
+## Firefox add-on URL (≤30 chars)
+transit-overlay
+
 ## Short description (Chrome/Edge ≤132 chars, Firefox summary ≤250)
 Adds a Transit option to the map menu on Zillow search pages, showing public transit lines and stations.
 
