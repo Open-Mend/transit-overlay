@@ -51,4 +51,4 @@ copy against the tagged release.
 - No Transit column: Zillow changed its menu. Check the console (F12).
 - Lines don't appear: pan or zoom the map once.
 
-Requires Firefox 128+, Chrome 111+ or Edge 111+.
+Requires Firefox 140+ (Android 142+), Chrome 111+ or Edge 111+.

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Transit Overlay for Home Search",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Adds a Transit option to the map menu on Zillow search pages, showing public transit lines and stations.",
   "icons": {
     "16": "icons/icon-16.png",
@@ -11,8 +11,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.zillow.com/*"],
-      "js": ["inject.js"],
+      "matches": [
+        "https://www.zillow.com/*"
+      ],
+      "js": [
+        "inject.js"
+      ],
       "run_at": "document_start",
       "world": "MAIN"
     }
@@ -20,8 +24,15 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "transit-overlay@home-search",
-      "strict_min_version": "128.0",
-      "data_collection_permissions": { "required": ["none"] }
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    },
+    "gecko_android": {
+      "strict_min_version": "142.0"
     }
   }
 }
