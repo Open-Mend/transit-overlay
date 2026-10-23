@@ -8,34 +8,32 @@ map. Your choice is remembered.
 No data is collected and nothing is sent anywhere (see [PRIVACY.md](PRIVACY.md)).
 Not affiliated with or endorsed by Zillow. MIT licensed.
 
-## Try it in Firefox (temporary, no signing needed)
-1. Go to `about:debugging#/runtime/this-firefox`.
-2. Click **Load Temporary Add-on…** and pick `manifest.json` in this folder.
-3. Open a Zillow search, click **Map** (bottom of the map) and choose
-   **Transit → On**.
+## Install
+- **Firefox:** [Get it from Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/transit-overlay/)
+- **Chrome and Edge:** store listings are coming later. Until then you can
+  install it manually (see below).
 
-Temporary add-ons are removed when Firefox restarts.
+Then open a Zillow search, click **Map** (bottom of the map) and choose
+**Transit → On**.
 
-## Install permanently in Firefox
-Firefox only keeps signed add-ons. Upload the Firefox zip (see Building)
-to https://addons.mozilla.org/developers/ — choose
-**On this site** (public listing) or **On your own** (unlisted, you get a
-signed .xpi to install yourself). Both are free.
-
-## Chrome / Edge
-1. Unzip `transit-overlay-<version>-chrome-edge.zip`.
+### Manual install in Chrome / Edge
+1. Download `transit-overlay-<version>-chrome-edge.zip` from the
+   [latest release](https://github.com/Open-Mend/transit-overlay/releases/latest)
+   and unzip it.
 2. Go to `chrome://extensions` (or `edge://extensions`), turn on
    **Developer mode**, click **Load unpacked** and pick the unzipped folder.
 
-Loading this source folder directly also works, but Chrome will show a
-harmless warning about the Firefox-only `browser_specific_settings` key.
+## Development
 
-To publish: Chrome Web Store (https://chrome.google.com/webstore/devconsole,
-one-time $5 fee) and Microsoft Edge Add-ons
-(https://partner.microsoft.com/dashboard/microsoftedge, free) both take the
-same `chrome-edge` zip.
+### Try local changes in Firefox
+1. Go to `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on…** and pick `manifest.json` in this folder.
 
-## Building
+Temporary add-ons are removed when Firefox restarts. In Chrome/Edge, use
+**Load unpacked** on this folder; Chrome will show a harmless warning about
+the Firefox-only `browser_specific_settings` key.
+
+### Building
 ```
 python3 build.py
 ```
