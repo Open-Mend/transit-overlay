@@ -11,9 +11,11 @@ permissions:
   contents: write
 jobs:
   release:
+    # Only release from main or a version tag.
+    if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Read version
         id: version
         run: |
@@ -23,6 +25,8 @@ jobs:
           fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - run: python3 build.py
+      - name: Checksums
+        run: cd dist && sha256sum *.zip > SHA256SUMS && cat SHA256SUMS
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -31,4 +35,4 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists; bump the version in manifest.json first."; exit 1
           fi
-          gh release create "$TAG" dist/*.zip --target "$GITHUB_SHA" --title "$TAG" --generate-notes
+          gh release create "$TAG" dist/*.zip dist/SHA256SUMS --target "$GITHUB_SHA" --title "$TAG" --generate-notes
