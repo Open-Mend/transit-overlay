@@ -1,6 +1,9 @@
-// Transit Overlay for Home Search, by OpenMend. Runs in Zillow's page and adds
-// map options Zillow doesn't offer. It collects nothing and makes no network
-// requests of its own; settings stay in this browser (localStorage, "zt-").
+// Neighborhood Lens: Map Tools for Home Search (formerly Transit Overlay for
+// Home Search), by Open Mend. Runs in Zillow's page and adds map options
+// Zillow doesn't offer. It collects nothing and makes no network requests of
+// its own; settings and pins stay in this browser, in zillow.com's
+// localStorage ("zt-" keys). It wraps Zillow's fetch and a few google.maps.Map
+// methods (see the first sections) and reads nothing else of Zillow's.
 //
 // - Map Options menu, widened into blocks: Transport (transit lines with
 //   station names, bike lanes, live traffic), Places (categories Zillow's map
@@ -363,8 +366,6 @@
       .gm-style .full-boundary-container[id^="parcel-"] { display: none !important; }`);
   }
 
-  // Make Zillow search again: a one-pixel pan there and back. When the lot
-  // outlines need to change, zoom out and in so Zillow fetches them again.
   // A 1px pan and back makes Zillow search again.
   function refreshSearch() {
     const map = visibleMap();
@@ -382,6 +383,7 @@
     const label = document.querySelector('#zt-list-button span');
     const text = state.hideList ? 'Show list' : 'Full map';
     if (label && label.textContent !== text) label.textContent = text;
+    document.getElementById('zt-list-button')?.setAttribute('aria-pressed', String(state.hideList));
   }
 
   // A copy of Zillow's "Map" button, placed just before it.
@@ -404,6 +406,7 @@
   // don't always pass it down (its menu defaults to Times).
   const FONT = 'Inter, "Inter Fallback", Arial, sans-serif';
   const PIN_COLOR = '#e8590c';
+  const RING_LABEL_COLOR = '#b84300';
   const PIN_PATH = 'M12 0C7 0 3 4 3 9c0 6.5 9 15 9 15s9-8.5 9-15c0-5-4-9-9-9z';
   // Walking at about 80 m a minute.
   const RINGS = [[400, '5 min'], [800, '10 min'], [1200, '15 min']];
@@ -517,7 +520,8 @@
       const ringLabels = RINGS.map(([radius, text]) => new google.maps.Marker({
         map: pin.rings ? map : null, position: north(position, radius), clickable: false,
         icon: { path: google.maps.SymbolPath.CIRCLE, scale: 0 },
-        label: { text, className: 'zt-ring-label', color: PIN_COLOR, fontSize: '11px', fontWeight: '700' },
+        // Darker than the pin colour so the small text passes 4.5:1 contrast.
+        label: { text, className: 'zt-ring-label', color: RING_LABEL_COLOR, fontSize: '11px', fontWeight: '700' },
       }));
       const marker = pinOverlay(map, position, pin, {
         // The rings follow the pin while it's dragged.
@@ -573,7 +577,9 @@
     const x = e.domEvent ? e.domEvent.clientX : innerWidth / 2;
     const y = e.domEvent ? e.domEvent.clientY : innerHeight / 2;
     Object.assign(box.style, {
-      position: 'fixed', left: Math.min(x, innerWidth - 330) + 'px', top: Math.min(y, innerHeight - 140) + 'px',
+      // Keep the 310px box (plus padding) on screen, even on narrow screens.
+      position: 'fixed', left: Math.max(8, Math.min(x, innerWidth - 330)) + 'px',
+      top: Math.max(8, Math.min(y, innerHeight - 140)) + 'px', maxWidth: 'calc(100vw - 16px)', boxSizing: 'border-box',
       zIndex: 2147483000, background: '#fff', borderRadius: '12px', padding: '12px',
       boxShadow: 'rgba(0, 0, 0, 0.15) 0 8px 20px 0', font: '14px/1.4 ' + FONT, color: '#111116', width: '310px'
     });
@@ -921,6 +927,8 @@
 
   // Lay the menu out as a grid: Zillow's map types and Climate Risks stay
   // where they are in the page; our sections are added around them.
+  // 160 + 160 + 210px columns, two 12px gaps and Zillow's 16px padding.
+  const MENU_WIDTH = 586;
   const BLOCK = { background: 'rgb(244, 244, 246)', borderRadius: '12px', padding: '0 12px 4px', boxSizing: 'border-box' };
 
   function enhanceMenu() {
@@ -939,9 +947,10 @@
     ]);
     const places = placesSection(template, legend);
     const climateRisks = climateSection(template, legend, climate);
-    climate.style.display = 'none';
     const tools = toolsSection(template, legend);
     body.append(transport, places, climateRisks, tools);
+    // Hide Zillow's own climate radios only once ours are in place.
+    climate.style.display = 'none';
     // Remember Zillow's own choices so they can be restored after a reload.
     const remember = (group, key) => group.addEventListener('change', () => {
       const checked = group.querySelector('input:checked');
@@ -951,7 +960,10 @@
     remember(climate, 'zt-climate');
     // Columns: map type | transport | places, with Climate Risks below the
     // first two. Each section is a light gray block.
-    const place = (el, column, row) => Object.assign(el.style, BLOCK, { gridColumn: column, gridRow: row });
+    // On narrow screens (phones) the blocks stack in one column instead.
+    const narrow = innerWidth < MENU_WIDTH + 32;
+    const place = (el, column, row) => Object.assign(el.style, BLOCK,
+      narrow ? { gridColumn: '1', gridRow: 'auto' } : { gridColumn: column, gridRow: row });
     place(mapTypes, '1', '1');
     place(transport, '2', '1');
     place(places, '3', '1 / span 2');
@@ -966,9 +978,9 @@
       heading.id = 'zt-maptype-heading';
       mapTypes.prepend(heading);
     }
-    // 160 + 160 + 210px columns, two 12px gaps and Zillow's 16px padding.
-    Object.assign(body.style, { display: 'grid', gridTemplateColumns: '160px 160px 210px', gap: '12px', paddingTop: '12px' });
-    Object.assign(content.style, { width: '586px', maxWidth: 'none', maxHeight: 'none' });
+    Object.assign(body.style, { display: 'grid', gridTemplateColumns: narrow ? '1fr' : '160px 160px 210px', gap: '12px', paddingTop: '12px' });
+    const width = narrow ? innerWidth - 32 : MENU_WIDTH;
+    Object.assign(content.style, { width: width + 'px', maxWidth: 'none', maxHeight: 'none' });
     // On short screens, keep the menu inside the map and let it scroll.
     // Zillow may move a menu that doesn't fit upwards, so check both edges,
     // and again after Zillow places the shorter menu.
@@ -980,7 +992,7 @@
       if (!over) return;
       Object.assign(content.style, { maxHeight: Math.max(200, box.height - over) + 'px', overflowY: 'auto', overflowX: 'hidden' });
       // Widen by the scroll bar so it doesn't cover the right column.
-      content.style.width = 586 + content.offsetWidth - content.clientWidth + 'px';
+      content.style.width = width + content.offsetWidth - content.clientWidth + 'px';
       if (tries) fit(tries - 1);
     });
     fit(3);
@@ -1014,7 +1026,7 @@
   // "Dark mode: Off / On / Auto", where Auto follows the browser's setting.
   function darkModeSelect() {
     const label = document.createElement('label');
-    label.title = 'Dark theme for all of Zillow, including the map. Auto follows your browser or system setting.';
+    label.title = 'Dark theme for the search page, including the map. Auto follows your browser or system setting.';
     Object.assign(label.style, { display: 'flex', alignItems: 'center', gap: '6px', font: '16px/24px ' + FONT, color: 'rgb(17, 17, 22)', padding: '12px 0', whiteSpace: 'nowrap' });
     const select = document.createElement('select');
     select.id = 'zt-dark';
@@ -1034,7 +1046,7 @@
     const radios = [...fieldset.querySelectorAll('input[type="radio"]')].filter(r => r.id !== 'none');
     const none = fieldset.querySelector('#none');
     const boxes = radios.map(radio => {
-      const name = fieldset.querySelector(`label[for="${radio.id}"]`).textContent;
+      const name = fieldset.querySelector(`label[for="${CSS.escape(radio.id)}"]`)?.textContent || radio.id;
       const description = `Shade the map by ${CLIMATE[radio.id] || name.toLowerCase()} risk`;
       return makeCheckbox(template, 'zt-climate-' + radio.id, name, description, radio.checked, on => {
         (on ? radio : none).click();
@@ -1084,11 +1096,19 @@
     checkQueued = true;
     requestAnimationFrame(() => {
       checkQueued = false;
-      enhanceMenu();
-      addListButton();
-      addMenuItems();
-      restoreZillowChoices();
+      // Each step on its own, so a change on Zillow's side that breaks one
+      // feature leaves the others working.
+      for (const step of [enhanceMenu, addListButton, addMenuItems, restoreZillowChoices]) {
+        try { step(); } catch (e) { warnOnce(step.name, e); }
+      }
     });
+  }
+
+  const warned = new Set();
+  function warnOnce(name, error) {
+    if (warned.has(name)) return;
+    warned.add(name);
+    console.warn(`Neighborhood Lens: ${name} failed; Zillow may have changed its page.`, error);
   }
 
   function startObserver() {
@@ -1109,7 +1129,11 @@
         border-radius: 50%; background: ${PIN_COLOR}; border: 2px solid #fff; pointer-events: none; }
       .zt-highlight::before { content: ''; position: absolute; inset: -16px; border: 4px solid ${PIN_COLOR};
         border-radius: 50%; animation: zt-pulse 1s ease-out infinite; }
-      @keyframes zt-pulse { from { transform: scale(0.5); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }`;
+      @keyframes zt-pulse { from { transform: scale(0.5); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .zt-highlight::before { animation: none; transform: scale(1.1); opacity: 0.5; }
+        .zt-hovering .gm-style .streamlined-marker-container { transition: none; }
+      }`;
     document.head.append(style);
     document.addEventListener('mouseover', onListingHover);
     document.addEventListener('mouseout', onListingHover);

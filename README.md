@@ -1,4 +1,6 @@
-# Transit Overlay for Home Search
+# Neighborhood Lens: Map Tools for Home Search
+
+Formerly *Transit Overlay for Home Search*.
 
 Extra map tools for Zillow search pages: transit lines with station names,
 bike lanes, live traffic, places, pins with walking rings, a distance measure
@@ -11,8 +13,9 @@ Browsers describe the extension's access as access to your data on
 www.zillow.com ("Access your data for www.zillow.com" in Firefox, "Read and
 change your data on www.zillow.com" in Chrome and Edge), the standard warning
 for any extension that changes a site.
-It only changes the search map and its menu; it doesn't read your Zillow
-account, saved homes, searches or messages. All of the page code is in
+It only changes the search map and its menu. It reads Zillow's map search
+data only to trim it in your browser, and never stores or sends it; it doesn't
+touch your Zillow account, saved homes or messages. All of the page code is in
 [inject.js](inject.js).
 
 Not affiliated with or endorsed by Zillow. MIT licensed.
@@ -30,7 +33,7 @@ Not affiliated with or endorsed by Zillow. MIT licensed.
 
 **On the map**
 - Right-click to add a pin with an optional label and 5, 10 and 15 minute
-  walking rings, or to open that spot in Google Maps. Drag a pin to move it;
+  walking rings (straight-line distance), or to open that spot in Google Maps. Drag a pin to move it;
   click it to rename, toggle its rings or remove it.
 - **Full map** (next to **Map**) hides the listings so the map fills the page.
 - Zoom in two levels further than Zillow allows.
@@ -40,8 +43,9 @@ Not affiliated with or endorsed by Zillow. MIT licensed.
 - In a listing's **"…"** menu, **Google Maps** opens its address. Google's page
   for the address has a photo that opens Street View.
 
-**Faster map:** with **Hide unlisted homes** on, off-market homes and property
-lines are removed from Zillow's own map data before Zillow draws them; with
+**Faster map:** with **Hide unlisted homes** on (the default), off-market homes
+and property lines are removed from Zillow's own map data in your browser
+before Zillow draws them; with
 **Full map** on, Zillow doesn't load the list. All settings, plus Zillow's own
 map type and climate risk, are remembered after a refresh.
 
@@ -80,9 +84,11 @@ Writes `transit-overlay-<version>-firefox.zip` and
 `transit-overlay-<version>-chrome-edge.zip` to `dist/`.
 Bump `version` in `manifest.json` before each store upload.
 
-The store packages contain exactly `manifest.json`, `inject.js`,
-`popup.html`, `popup.js` and `icons/*.png` from this repo, unminified, so
-anyone can compare an installed copy against the tagged release.
+The store packages contain `inject.js`, `popup.html`, `popup.js`,
+`icons/*.png` and `LICENSE` exactly as they are in this repo, unminified, plus
+a `manifest.json` generated from this repo's (the Chrome/Edge copy drops the
+Firefox-only keys), so anyone can compare an installed copy against the tagged
+release. Each release also lists the zips' SHA-256 checksums in `SHA256SUMS`.
 
 ## Troubleshooting
 - Nothing added to the Map menu: Zillow may have changed its page. Check the

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.1
+- New name: Neighborhood Lens: Map Tools for Home Search (formerly Transit
+  Overlay for Home Search). The Firefox add-on ID is unchanged, so existing
+  installs keep updating.
+- Privacy note, README and store listing describe more precisely what the
+  extension reads and where pins are stored, and that the extra map layers are
+  downloaded by the Google map Zillow already uses.
+- Map menu stacks into one column on narrow screens instead of running off
+  the edge.
+- If Zillow changes part of its page, only the affected feature stops; the
+  rest keep working.
+- "Full map" announces whether it's on to screen readers; the pulsing hover
+  marker respects "reduce motion"; walking-ring labels have stronger contrast.
+- Release zips now include the LICENSE and a SHA256SUMS file.
+
 ## 0.5.0
 - Map menu redesigned into blocks: Map type, Transport, Places, Climate Risks
   and Tools. Every option has a description; on short screens it scrolls.
