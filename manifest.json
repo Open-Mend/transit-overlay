@@ -1,13 +1,23 @@
 {
   "manifest_version": 3,
   "name": "Transit Overlay for Home Search",
-  "version": "0.4.2",
-  "description": "Adds a Transit option to the map menu on Zillow search pages, showing public transit lines and stations.",
+  "version": "0.5.0",
+  "description": "Adds transit, bike lanes, live traffic, places, pins, a measure tool and dark mode to Zillow's map, and makes it load faster.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Transit Overlay: what it adds and where",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
   },
   "content_scripts": [
     {

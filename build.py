@@ -11,7 +11,7 @@ import zipfile
 
 SRC = pathlib.Path(__file__).resolve().parent
 DIST = SRC / 'dist'
-FILES = ['inject.js', 'icons/icon-16.png', 'icons/icon-32.png',
+FILES = ['inject.js', 'popup.html', 'popup.js', 'icons/icon-16.png', 'icons/icon-32.png',
          'icons/icon-48.png', 'icons/icon-128.png']
 
 manifest = json.loads((SRC / 'manifest.json').read_text())
